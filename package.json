@@ -13,7 +13,7 @@
   "license": "ISC",
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
   "dependencies": {
     "commandkit": "^0.1.10",
     "discord.js": "^14.14.1",
