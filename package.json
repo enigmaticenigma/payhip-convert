@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch --no-warnings .",
-    "start": "node .",
-    "heroku-postbuild": "mkdir ./.cache && mv /app/.cache/puppeteer ./.cache"
+    "start": "node ."
   },
   "keywords": [],
   "author": "",
