@@ -19,9 +19,9 @@ module.exports = {
     webhook(targetUrl);
 
     async function webhook(url) {
-      (async () => {
+      try {
         const browser = await puppeteer.launch({
-          headless: true,
+          headless: "new",
           args: ["--no-sandbox", "--disable-setuid-sandbox"],
         });
         const page = await browser.newPage();
@@ -32,6 +32,23 @@ module.exports = {
         await page.goto(url, {
           waitUntil: "domcontentloaded",
         });
+
+        await page.waitForSelector(
+          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 h1.font-section-product-name",
+          { timeout: 5000 }
+        ); // Replace with the correct selector for title
+        await page.waitForSelector(
+          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-price span.value.js-product-price-value.custom-style-color-text-heading.font-section-product-price",
+          { timeout: 5000 }
+        ); // Replace with the correct selector for price
+        await page.waitForSelector(
+          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.media-wrapper-outer div.single-product-image-wrapper.lightbox-trigger-item.js-lightbox-trigger-item img.single-product-image.zoom-trigger-item.js-zoom-trigger-item.global-media-settings",
+          { timeout: 5000 }
+        ); // Replace with the correct selector for image
+        await page.waitForSelector(
+          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-description.font-section-product-description.richtext.richtext-quill",
+          { timeout: 5000 }
+        ); // Replace with the correct selector for description
 
         const product = await page.evaluate(() => {
           const title = document.querySelector(
@@ -45,7 +62,6 @@ module.exports = {
               "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.media-wrapper-outer div.single-product-image-wrapper.lightbox-trigger-item.js-lightbox-trigger-item img.single-product-image.zoom-trigger-item.js-zoom-trigger-item.global-media-settings"
             )
             .getAttribute("src");
-
           const description = document.querySelector(
             "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-description.font-section-product-description.richtext.richtext-quill"
           ).innerHTML;
@@ -82,7 +98,13 @@ module.exports = {
 
         channel.send({ embeds: [embed] });
         interaction.followUp({ content: "Embed sent!", ephemeral: true });
-      })();
+      } catch (error) {
+        console.error("Error occurred:", error);
+        interaction.followUp({
+          content: "Error occurred while fetching data.",
+          ephemeral: true,
+        });
+      }
     }
   },
   options: {
