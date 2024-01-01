@@ -57,9 +57,9 @@ module.exports = {
         const price = product.price?.replace("$", "");
         const image = product.image;
         const description = product.description
-          .replace(/<\/p>/g, "\n")
-          .replace(/<p>|<br>/g, "")
-          .replace(/Features:/g, "> **Features:**")
+          ?.replace(/<\/p>/g, "\n")
+          ?.replace(/<p>|<br>/g, "")
+          ?.replace(/Features:/g, "> **Features:**")
           .concat(`\n> **Price:**`)
           .concat(`\n・$${price} USD`)
           .concat(`\n・${price * 200} ROBUX`);
