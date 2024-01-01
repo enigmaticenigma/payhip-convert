@@ -18,7 +18,7 @@ module.exports = {
 
     webhook(targetUrl);
 
-    function webhook(url) {
+    async function webhook(url) {
       (async () => {
         const browser = await puppeteer.launch({
           headless: true,
