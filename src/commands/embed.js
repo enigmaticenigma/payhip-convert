@@ -27,11 +27,10 @@ module.exports = {
         const page = await browser.newPage();
 
         await page.setUserAgent(
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
         );
         await page.goto(url, {
-          waitUntil: ["networkidle2", "load"],
-          timeout: 10000,
+          waitUntil: "domcontentloaded",
         });
 
         const product = await page.evaluate(() => {
