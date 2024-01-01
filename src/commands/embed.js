@@ -66,7 +66,7 @@ module.exports = {
       await browser.close();
     } catch (error) {
       console.error("Error occurred:", error);
-      await interaction.reply({
+      await interaction.followUp({
         content: "Error occurred while fetching data.",
         ephemeral: true,
       });
