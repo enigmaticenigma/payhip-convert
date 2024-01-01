@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const puppeteer = require("puppeteer");
+const { chromium } = require("playwright");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -11,100 +11,65 @@ module.exports = {
         .setDescription("The URL of the product.")
         .setRequired(true)
     ),
-  run: async ({ interaction, client, handler }) => {
-    await interaction.deferReply({ ephemeral: true });
-    const targetUrl = interaction.options.getString("url");
-    const channel = client.channels.cache.get(interaction.channelId);
+  run: async ({ interaction, client }) => {
+    try {
+      await interaction.deferReply({ ephemeral: true });
+      const targetUrl = interaction.options.getString("url");
 
-    webhook(targetUrl);
+      const browser = await chromium.launch();
+      const context = await browser.newContext();
+      const page = await context.newPage();
 
-    async function webhook(url) {
-      try {
-        const browser = await puppeteer.launch({
-          headless: "new",
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        });
-        const page = await browser.newPage();
+      await page.goto(targetUrl, { waitUntil: "domcontentloaded" });
 
-        await page.setUserAgent(
-          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-        );
-        await page.goto(url, {
-          waitUntil: "domcontentloaded",
-        });
+      const title = await page.textContent(
+        "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 h1.font-section-product-name"
+      );
 
-        await page.waitForSelector(
-          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 h1.font-section-product-name",
-          { timeout: 5000 }
-        ); // Replace with the correct selector for title
-        await page.waitForSelector(
-          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-price span.value.js-product-price-value.custom-style-color-text-heading.font-section-product-price",
-          { timeout: 5000 }
-        ); // Replace with the correct selector for price
-        await page.waitForSelector(
-          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.media-wrapper-outer div.single-product-image-wrapper.lightbox-trigger-item.js-lightbox-trigger-item img.single-product-image.zoom-trigger-item.js-zoom-trigger-item.global-media-settings",
-          { timeout: 5000 }
-        ); // Replace with the correct selector for image
-        await page.waitForSelector(
-          "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-description.font-section-product-description.richtext.richtext-quill",
-          { timeout: 5000 }
-        ); // Replace with the correct selector for description
+      const price = await page.textContent(
+        "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-price span.value.js-product-price-value.custom-style-color-text-heading.font-section-product-price"
+      );
 
-        const product = await page.evaluate(() => {
-          const title = document.querySelector(
-            "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 h1.font-section-product-name"
-          ).innerText;
-          const price = document.querySelector(
-            "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-price span.value.js-product-price-value.custom-style-color-text-heading.font-section-product-price"
-          ).innerText;
-          const image = document
-            .querySelector(
-              "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.media-wrapper-outer div.single-product-image-wrapper.lightbox-trigger-item.js-lightbox-trigger-item img.single-product-image.zoom-trigger-item.js-zoom-trigger-item.global-media-settings"
-            )
-            .getAttribute("src");
-          const description = document.querySelector(
-            "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-description.font-section-product-description.richtext.richtext-quill"
-          ).innerHTML;
+      const image = await page.getAttribute(
+        "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.media-wrapper-outer div.single-product-image-wrapper.lightbox-trigger-item.js-lightbox-trigger-item img.single-product-image.zoom-trigger-item.js-zoom-trigger-item.global-media-settings",
+        "src"
+      );
 
-          return {
-            title,
-            price,
-            description,
-            image,
-          };
-        });
+      const description = await page.innerHTML(
+        "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-description.font-section-product-description.richtext.richtext-quill"
+      );
 
-        const title = product.title;
-        const price = product.price.replace("$", "");
-        const image = product.image;
-        const description = product.description
-          .replace(/<\/p>/g, "\n")
-          .replace(/<p>|<br>/g, "")
-          .replace(/Features:/g, "> **Features:**")
-          .concat(`\n> **Price:**`)
-          .concat(`\n・$${price} USD`)
-          .concat(`\n・${price * 200} ROBUX`);
+      const formattedDescription = description
+        .replace(/<\/p>/g, "\n")
+        .replace(/<p>|<br>/g, "")
+        .replace(/Features:/g, "> **Features:**")
+        .concat("\n> **Price:**")
+        .concat(`\n・${price.replace("$", "")} USD`)
+        .concat(`\n・${parseFloat(price.replace("$", "")) * 200} ROBUX`);
 
-        await browser.close();
+      await interaction.followUp({
+        content: "Embeded",
+        ephemeral: true,
+      });
 
-        const embed = {
-          title: `${title}`,
-          description: `${description}`,
-          url: url,
-          image: {
-            url: `${image}`,
-          },
-        };
+      const embed = {
+        title: title,
+        description: formattedDescription,
+        url: targetUrl,
+        image: {
+          url: image,
+        },
+      };
 
-        channel.send({ embeds: [embed] });
-        interaction.followUp({ content: "Embed sent!", ephemeral: true });
-      } catch (error) {
-        console.error("Error occurred:", error);
-        interaction.followUp({
-          content: "Error occurred while fetching data.",
-          ephemeral: true,
-        });
-      }
+      const channel = client.channels.cache.get(interaction.channelId);
+      await channel.send({ embeds: [embed] });
+      await browser.close();
+    } catch (error) {
+      console.error("Error occurred:", error);
+      await interaction.reply({
+        content: "Error occurred while fetching data.",
+        ephemeral: true,
+      });
     }
   },
   options: {
