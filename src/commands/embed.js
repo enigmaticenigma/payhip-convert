@@ -16,7 +16,7 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const targetUrl = interaction.options.getString("url");
 
-      const browser = await chromium.launch();
+      const browser = await chromium.launch({ headless: true });
       const context = await browser.newContext();
       const page = await context.newPage();
 
