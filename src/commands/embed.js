@@ -54,7 +54,7 @@ module.exports = {
         });
 
         const title = product.title;
-        const price = product.price.replace("$", "");
+        const price = product.price?.replace("$", "");
         const image = product.image;
         const description = product.description
           .replace(/<\/p>/g, "\n")
