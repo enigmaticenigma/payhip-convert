@@ -26,7 +26,7 @@ module.exports = {
         });
         const page = await browser.newPage();
 
-        await page.goto(url);
+        await page.goto(url, { waitUntil: "domcontentloaded" });
 
         const product = await page.evaluate(() => {
           const title = document.querySelector(
