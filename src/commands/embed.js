@@ -39,7 +39,7 @@ module.exports = {
             .querySelector(
               "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.media-wrapper-outer div.single-product-image-wrapper.lightbox-trigger-item.js-lightbox-trigger-item img.single-product-image.zoom-trigger-item.js-zoom-trigger-item.global-media-settings"
             )
-            .getAttribute("src");
+            ?.getAttribute("src");
 
           const description = document.querySelector(
             "html.js body#page-product div.content-main-wrapper.js-content-main-wrapper.js-builder-content-main-wrapper div#page-section-product.section-wrapper.js-section-wrapper.js-builder-section-wrapper.js-header-magic-padding-has-been-set div.section-contents-wrapper.js-section-contents-wrapper.js-builder-section-contents-wrapper.standard-padding-left-right div.section-contents.js-section-contents.js-builder-section-contents div.media-and-details-wrapper-outer div.product-details-wrapper div.row div.col-md-12 div.product-description.font-section-product-description.richtext.richtext-quill"
