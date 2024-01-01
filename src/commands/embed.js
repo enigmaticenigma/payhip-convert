@@ -26,8 +26,10 @@ module.exports = {
         });
         const page = await browser.newPage();
 
-        await page.goto(url);
-        await page.waitForNavigation({ waitUntil: "domcontentloaded" });
+        await page.setUserAgent(
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+        );
+        await page.goto(url, { waitUntil: "networkidle2" });
 
         const product = await page.evaluate(() => {
           const title = document.querySelector(
